@@ -11,6 +11,14 @@ Installation
 
 Ladda ner zip-fil och kopiera den till en folder under apaches web-root folder.
 
+Uppdatera RewriteBase i .htaccess filen enligt din installation.
+
+Gör följande foldrar skrivbara för webbservern:
+* webroot/ (så att webbservern kan skriva till databasfilen .htsqlite.db)
+* webroot/css/anax-grid/ (så att webbservern kan skapa en .less-fil)
+
+Vid behov, ändra sökväg till databafilen genom att uppdatera filen app/config/database_sqlite.php.
+
 Validera composer.json fil genom att köra följande kommando i web-root folder:
 
     composer validate
