@@ -191,15 +191,7 @@ class UsersController implements \Anax\DI\IInjectionAware
                 'params'    => [$user->acronym ],
                 // 'params'    => [$user['acronym'] ],
             ]);
-        } else {
-            // Dispatch to login Form
-            $this->dispatcher->forward([
-                'controller' => 'users',
-                'action'     => 'login',
-                'params'    => [ ],
-            ]);
         }
-
         $this->theme->setTitle("Byggare");
         $this->views->add('users/list-all', [
             'users' => $all,
