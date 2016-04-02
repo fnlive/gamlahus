@@ -308,6 +308,20 @@ class UsersController implements \Anax\DI\IInjectionAware
                 'required'    => true,
                 'validation'  => ['not_empty', 'email_adress'],
             ],
+            'password' => [
+                'type'        => 'password',
+                'label'       => 'Lösenord:',
+                'required'    => true,
+                'validation'  => ['not_empty'],
+            ],
+            'password2' => [
+                'type'        => 'password',
+                'label'       => 'Repetera lösenord:',
+                'required'    => true,
+                "validation" => [
+                    "match" => "password", 'not_empty'
+                ],
+            ],
             'submit' => [
                 'type'      => 'submit',
                 'value'      => 'Skapa byggare',
@@ -342,7 +356,7 @@ class UsersController implements \Anax\DI\IInjectionAware
             'acronym' => $form->Value('acronym'),
             'email' => $form->Value('email'),
             'name' => $form->Value('name'),
-            'password' => md5($acronym),
+            'password' => md5($form->Value('password')),
             'created' => $now,
             'active' => $now,
         ]);
@@ -420,14 +434,14 @@ class UsersController implements \Anax\DI\IInjectionAware
             'name' => [
                 'type'        => 'text',
                 'value'       => $user->name,
-                'label'       => 'Name of person:',
+                'label'       => 'Namn:',
                 'required'    => true,
                 'validation'  => ['not_empty'],
             ],
             'acronym' => [
                 'type'        => 'text',
                 'value'       => $user->acronym,
-                'label'       => 'Acronym of person:',
+                'label'       => 'Akronym:',
                 'required'    => true,
                 'validation'  => ['not_empty'],
             ],
@@ -441,14 +455,24 @@ class UsersController implements \Anax\DI\IInjectionAware
                 'type'        => 'hidden',
                 'value'       => $user->id,
             ],
+            'password' => [
+                'type'        => 'password',
+                'label'       => 'Lösenord:',
+                'required'    => false,
+            ],
+            'password2' => [
+                'type'        => 'password',
+                'label'       => 'Repetera lösenord:',
+                'required'    => false,
+                "validation" => [
+                    "match" => "password",
+                ],
+            ],
             'submit' => [
                 'type'      => 'submit',
+                'value'      => 'Uppdatera byggare',
                 'label'       => 'Uppdatera',
                 'callback'  => [$this, 'callbackSubmitUpdateUser'],
-            ],
-            'submit-fail' => [
-                'type'      => 'submit',
-                'callback'  => [$this, 'callbackSubmitFailUpdateUser'],
             ],
         ]);
     }
@@ -469,14 +493,21 @@ class UsersController implements \Anax\DI\IInjectionAware
         // die();
         // Save user data to database
         $now = gmdate('Y-m-d H:i:s');
-        $this->users->save([
-            'acronym' => $form->Value('acronym'),
-            'email' => $form->Value('email'),
-            'name' => $form->Value('name'),
-            // 'password' => md5($acronym, PASSWORD_DEFAULT),
-            // 'created' => $now,
-            // 'active' => $now,
-        ]);
+        $password = $form->Value('password');
+        if ("" == $password) {
+            $this->users->save([
+                'acronym' => $form->Value('acronym'),
+                'email' => $form->Value('email'),
+                'name' => $form->Value('name'),
+            ]);
+        } else {
+            $this->users->save([
+                'acronym' => $form->Value('acronym'),
+                'email' => $form->Value('email'),
+                'name' => $form->Value('name'),
+                'password' => md5($password),
+            ]);
+        }
 
         // $form->AddOutput("<p><b>Name: " . $form->Value('name') . "</b></p>");
         // $form->AddOutput("<p><b>Email: " . $form->Value('email') . "</b></p>");
