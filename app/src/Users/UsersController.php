@@ -682,6 +682,7 @@ class UsersController implements \Anax\DI\IInjectionAware
         // TODO: Check if user is logged in. Display logout links
         // else display login form and link to user registration.
         if ($this->users->loggedIn()) {
+            $this->di->theme->setTitle("Logga ut");
             $this->di->views->add('default/page', [
                 'title' => "Logga ut",
                 'content' => "",
