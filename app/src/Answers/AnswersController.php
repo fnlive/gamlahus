@@ -102,6 +102,7 @@ class AnswersController implements \Anax\DI\IInjectionAware
             ],
             'submit' => [
                 'type'      => 'submit',
+                'value'       => 'Svara',
                 'callback'  => [$this, 'callbackSubmitAddAnswer'],
             ],
             // 'submit-fail' => [
