@@ -385,6 +385,7 @@ class QuestionsController implements \Anax\DI\IInjectionAware
             ],
             'submit' => [
                 'type'      => 'submit',
+                'value'      => 'Skicka fråga',
                 'callback'  => [$this, 'callbackSubmitAddQuestion'],
             ],
             // 'submit-fail' => [

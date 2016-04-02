@@ -191,15 +191,7 @@ class UsersController implements \Anax\DI\IInjectionAware
                 'params'    => [$user->acronym ],
                 // 'params'    => [$user['acronym'] ],
             ]);
-        } else {
-            // Dispatch to login Form
-            $this->dispatcher->forward([
-                'controller' => 'users',
-                'action'     => 'login',
-                'params'    => [ ],
-            ]);
         }
-
         $this->theme->setTitle("Byggare");
         $this->views->add('users/list-all', [
             'users' => $all,
@@ -287,31 +279,27 @@ class UsersController implements \Anax\DI\IInjectionAware
      */
     public function addAction($acronym = null)
     {
-        if ($this->users->loggedIn()) {
             $this->di->session(); // Will load the session service which also starts the session
             $form = $this->createAddUserForm();
             $form->check([$this, 'callbackSuccess'], [$this, 'callbackFail']);
-            $this->di->theme->setTitle("Add user");
+            $this->di->theme->setTitle("Skapa byggare");
             $this->di->views->add('default/page', [
-                'title' => "Add user",
+                'title' => "Skapa byggare",
                 'content' => $form->getHTML()
             ]);
-        } else {
-            $this->redirectTo($this->url->create('users/login'));
-        }
     }
     private function createAddUserForm()
     {
         return $this->di->form->create([], [
             'name' => [
                 'type'        => 'text',
-                'label'       => 'Name of person:',
+                'label'       => 'Namn:',
                 'required'    => true,
                 'validation'  => ['not_empty'],
             ],
             'acronym' => [
                 'type'        => 'text',
-                'label'       => 'Acronym of person:',
+                'label'       => 'Akronym:',
                 'required'    => true,
                 'validation'  => ['not_empty'],
             ],
@@ -320,8 +308,23 @@ class UsersController implements \Anax\DI\IInjectionAware
                 'required'    => true,
                 'validation'  => ['not_empty', 'email_adress'],
             ],
+            'password' => [
+                'type'        => 'password',
+                'label'       => 'Lösenord:',
+                'required'    => true,
+                'validation'  => ['not_empty'],
+            ],
+            'password2' => [
+                'type'        => 'password',
+                'label'       => 'Repetera lösenord:',
+                'required'    => true,
+                "validation" => [
+                    "match" => "password", 'not_empty'
+                ],
+            ],
             'submit' => [
                 'type'      => 'submit',
+                'value'      => 'Skapa byggare',
                 'callback'  => [$this, 'callbackSubmitAddUser'],
             ],
             // 'submit-fail' => [
@@ -353,7 +356,7 @@ class UsersController implements \Anax\DI\IInjectionAware
             'acronym' => $form->Value('acronym'),
             'email' => $form->Value('email'),
             'name' => $form->Value('name'),
-            'password' => md5($acronym),
+            'password' => md5($form->Value('password')),
             'created' => $now,
             'active' => $now,
         ]);
@@ -379,7 +382,7 @@ class UsersController implements \Anax\DI\IInjectionAware
      */
     public function callbackSuccess($form)
     {
-        $form->AddOUtput("<p><i>Form was submitted and the callback method returned true.</i></p>");
+        // $form->AddOUtput("<p><i>Form was submitted and the callback method returned true.</i></p>");
         $this->redirectTo('users/list/');
     }
     /**
@@ -431,14 +434,14 @@ class UsersController implements \Anax\DI\IInjectionAware
             'name' => [
                 'type'        => 'text',
                 'value'       => $user->name,
-                'label'       => 'Name of person:',
+                'label'       => 'Namn:',
                 'required'    => true,
                 'validation'  => ['not_empty'],
             ],
             'acronym' => [
                 'type'        => 'text',
                 'value'       => $user->acronym,
-                'label'       => 'Acronym of person:',
+                'label'       => 'Akronym:',
                 'required'    => true,
                 'validation'  => ['not_empty'],
             ],
@@ -452,14 +455,24 @@ class UsersController implements \Anax\DI\IInjectionAware
                 'type'        => 'hidden',
                 'value'       => $user->id,
             ],
+            'password' => [
+                'type'        => 'password',
+                'label'       => 'Lösenord:',
+                'required'    => false,
+            ],
+            'password2' => [
+                'type'        => 'password',
+                'label'       => 'Repetera lösenord:',
+                'required'    => false,
+                "validation" => [
+                    "match" => "password",
+                ],
+            ],
             'submit' => [
                 'type'      => 'submit',
+                'value'      => 'Uppdatera byggare',
                 'label'       => 'Uppdatera',
                 'callback'  => [$this, 'callbackSubmitUpdateUser'],
-            ],
-            'submit-fail' => [
-                'type'      => 'submit',
-                'callback'  => [$this, 'callbackSubmitFailUpdateUser'],
             ],
         ]);
     }
@@ -480,14 +493,21 @@ class UsersController implements \Anax\DI\IInjectionAware
         // die();
         // Save user data to database
         $now = gmdate('Y-m-d H:i:s');
-        $this->users->save([
-            'acronym' => $form->Value('acronym'),
-            'email' => $form->Value('email'),
-            'name' => $form->Value('name'),
-            // 'password' => md5($acronym, PASSWORD_DEFAULT),
-            // 'created' => $now,
-            // 'active' => $now,
-        ]);
+        $password = $form->Value('password');
+        if ("" == $password) {
+            $this->users->save([
+                'acronym' => $form->Value('acronym'),
+                'email' => $form->Value('email'),
+                'name' => $form->Value('name'),
+            ]);
+        } else {
+            $this->users->save([
+                'acronym' => $form->Value('acronym'),
+                'email' => $form->Value('email'),
+                'name' => $form->Value('name'),
+                'password' => md5($password),
+            ]);
+        }
 
         // $form->AddOutput("<p><b>Name: " . $form->Value('name') . "</b></p>");
         // $form->AddOutput("<p><b>Email: " . $form->Value('email') . "</b></p>");
@@ -659,14 +679,41 @@ class UsersController implements \Anax\DI\IInjectionAware
         // TODO: Need to sweep session? How?
         // Set saveInSession = false instead.
         $this->di->session(); // Will load the session service which also starts the session
-        $form = $this->createLoginForm();
-        $form->check([$this, 'callbackLoginSuccess'], [$this, 'callbackLoginSuccess']);
-        $this->di->theme->setTitle("Logga in");
-        $this->di->views->add('default/page', [
-            'title' => "Logga in",
-            'content' => $form->getHTML()
-        ]);
+        // TODO: Check if user is logged in. Display logout links
+        // else display login form and link to user registration.
+        if ($this->users->loggedIn()) {
+            $this->di->theme->setTitle("Logga ut");
+            $this->di->views->add('default/page', [
+                'title' => "Logga ut",
+                'content' => "",
+                'links' => [
+                    [
+                        'href' => $this->url->create('users/logout'),
+                        'text' => "Logga ut mig",
+                    ],
+                ],
+            ]);
+        } else {
+            $form = $this->createLoginForm();
+            $form->check([$this, 'callbackLoginSuccess'], [$this, 'callbackLoginSuccess']);
+            $this->di->theme->setTitle("Logga in");
+            $this->di->views->add('default/page', [
+                'title' => "Logga in",
+                'content' => $form->getHTML()
+            ]);
+            $this->di->views->add('default/page', [
+                'title' => "Skapa Byggare",
+                'content' => "Har du inget Byggar-konto?",
+                'links' => [
+                    [
+                        'href' => $this->url->create('users/add'),
+                        'text' => "Skapa ett",
+                    ],
+                ],
+            ]);
+        }
     }
+
     private function createLoginForm()
     {
         return $this->di->form->create([], [
@@ -684,11 +731,8 @@ class UsersController implements \Anax\DI\IInjectionAware
             ],
             'submit' => [
                 'type'      => 'submit',
+                'value'       => 'Logga in',
                 'callback'  => [$this, 'callbackSubmitLogin'],
-            ],
-            'submit-fail' => [
-                'type'      => 'submit',
-                'callback'  => [$this, 'callbackSubmitFailLogin'],
             ],
         ]);
     }

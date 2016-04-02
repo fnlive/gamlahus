@@ -36,6 +36,23 @@ return [
             'text'  =>'Byggare',
             'url'   => $this->di->get('url')->create('users/list'),
             'title' => 'Byggare',
+            // Here we add the submenu, with some menu items, as part of a existing menu item
+            'submenu' => [
+                'items' => [
+                    // This is a menu item of the submenu
+                    'adminquestions'  => [
+                        'text'  => 'Alla Byggare',
+                        'url'   => $this->di->get('url')->create('users/list'),
+                        'title' => 'Alla Byggare'
+                    ],
+                    // This is a menu item of the submenu
+                    'useradmin'  => [
+                        'text'  => 'Skapa Byggare',
+                        'url'   => $this->di->get('url')->create('users/add'),
+                        'title' => 'Skapa Byggare'
+                    ],
+                ],
+            ],
         ],
 
         // This is a menu item
@@ -44,17 +61,17 @@ return [
             'url'   => $this->di->get('url')->create('questions/ask'),
             'title' => 'Fråga en fråga',
         ],
-        'loginout' => [
-            // 'text'  => $this->di->get('users')->loggedIn() ? 'true text' : 'false text',
-            'text'  => 'Login',
-            'url'   => $this->di->get('url')->create('users/login'),
-            'title' => 'Logga in eller ut',
-        ],
         'about' => [
             // 'text'  => $this->di->get('users')->loggedIn() ? 'true text' : 'false text',
             'text'  => 'Om oss',
             'url'   => $this->di->get('url')->create('about'),
             'title' => 'Om oss',
+        ],
+        'loginout' => [
+            // 'text'  => $this->di->get('users')->loggedIn() ? 'true text' : 'false text',
+            'text'  => 'Logga in/ut',
+            'url'   => $this->di->get('url')->create('users/login'),
+            'title' => 'Logga in eller ut',
         ],
 
 

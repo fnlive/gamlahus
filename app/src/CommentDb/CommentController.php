@@ -61,7 +61,7 @@ class CommentController implements \Anax\DI\IInjectionAware
         return $this->di->form->create([], [
             'content' => [
                 'type'        => 'textarea',
-                'label'       => 'Comment:',
+                'label'       => 'Kommentera:',
                 'required'    => true,
                 'validation'  => ['not_empty'],
             ],
@@ -75,6 +75,7 @@ class CommentController implements \Anax\DI\IInjectionAware
             ],
             'submit' => [
                 'type'      => 'submit',
+                'value'       => 'Skicka kommentar',
                 'callback'  => [$this, 'callbackSubmitAddComment'],
             ],
             // 'submit-fail' => [
