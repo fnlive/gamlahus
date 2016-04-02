@@ -293,7 +293,7 @@ class UsersController implements \Anax\DI\IInjectionAware
             $form->check([$this, 'callbackSuccess'], [$this, 'callbackFail']);
             $this->di->theme->setTitle("Add user");
             $this->di->views->add('default/page', [
-                'title' => "Add user",
+                'title' => "Skapa användare",
                 'content' => $form->getHTML()
             ]);
         } else {
@@ -305,13 +305,13 @@ class UsersController implements \Anax\DI\IInjectionAware
         return $this->di->form->create([], [
             'name' => [
                 'type'        => 'text',
-                'label'       => 'Name of person:',
+                'label'       => 'Namn:',
                 'required'    => true,
                 'validation'  => ['not_empty'],
             ],
             'acronym' => [
                 'type'        => 'text',
-                'label'       => 'Acronym of person:',
+                'label'       => 'Akronym:',
                 'required'    => true,
                 'validation'  => ['not_empty'],
             ],
@@ -322,6 +322,7 @@ class UsersController implements \Anax\DI\IInjectionAware
             ],
             'submit' => [
                 'type'      => 'submit',
+                'value'      => 'Skapa användare',
                 'callback'  => [$this, 'callbackSubmitAddUser'],
             ],
             // 'submit-fail' => [
@@ -684,11 +685,8 @@ class UsersController implements \Anax\DI\IInjectionAware
             ],
             'submit' => [
                 'type'      => 'submit',
+                'value'       => 'Logga in',
                 'callback'  => [$this, 'callbackSubmitLogin'],
-            ],
-            'submit-fail' => [
-                'type'      => 'submit',
-                'callback'  => [$this, 'callbackSubmitFailLogin'],
             ],
         ]);
     }
