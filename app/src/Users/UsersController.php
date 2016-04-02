@@ -287,18 +287,14 @@ class UsersController implements \Anax\DI\IInjectionAware
      */
     public function addAction($acronym = null)
     {
-        if ($this->users->loggedIn()) {
             $this->di->session(); // Will load the session service which also starts the session
             $form = $this->createAddUserForm();
             $form->check([$this, 'callbackSuccess'], [$this, 'callbackFail']);
-            $this->di->theme->setTitle("Add user");
+            $this->di->theme->setTitle("Skapa byggare");
             $this->di->views->add('default/page', [
-                'title' => "Skapa användare",
+                'title' => "Skapa byggare",
                 'content' => $form->getHTML()
             ]);
-        } else {
-            $this->redirectTo($this->url->create('users/login'));
-        }
     }
     private function createAddUserForm()
     {
@@ -322,7 +318,7 @@ class UsersController implements \Anax\DI\IInjectionAware
             ],
             'submit' => [
                 'type'      => 'submit',
-                'value'      => 'Skapa användare',
+                'value'      => 'Skapa byggare',
                 'callback'  => [$this, 'callbackSubmitAddUser'],
             ],
             // 'submit-fail' => [
@@ -380,7 +376,7 @@ class UsersController implements \Anax\DI\IInjectionAware
      */
     public function callbackSuccess($form)
     {
-        $form->AddOUtput("<p><i>Form was submitted and the callback method returned true.</i></p>");
+        // $form->AddOUtput("<p><i>Form was submitted and the callback method returned true.</i></p>");
         $this->redirectTo('users/list/');
     }
     /**
@@ -660,14 +656,40 @@ class UsersController implements \Anax\DI\IInjectionAware
         // TODO: Need to sweep session? How?
         // Set saveInSession = false instead.
         $this->di->session(); // Will load the session service which also starts the session
-        $form = $this->createLoginForm();
-        $form->check([$this, 'callbackLoginSuccess'], [$this, 'callbackLoginSuccess']);
-        $this->di->theme->setTitle("Logga in");
-        $this->di->views->add('default/page', [
-            'title' => "Logga in",
-            'content' => $form->getHTML()
-        ]);
+        // TODO: Check if user is logged in. Display logout links
+        // else display login form and link to user registration.
+        if ($this->users->loggedIn()) {
+            $this->di->views->add('default/page', [
+                'title' => "Logga ut",
+                'content' => "",
+                'links' => [
+                    [
+                        'href' => $this->url->create('users/logout'),
+                        'text' => "Logga ut mig",
+                    ],
+                ],
+            ]);
+        } else {
+            $form = $this->createLoginForm();
+            $form->check([$this, 'callbackLoginSuccess'], [$this, 'callbackLoginSuccess']);
+            $this->di->theme->setTitle("Logga in");
+            $this->di->views->add('default/page', [
+                'title' => "Logga in",
+                'content' => $form->getHTML()
+            ]);
+            $this->di->views->add('default/page', [
+                'title' => "Skapa Byggare",
+                'content' => "Har du inget Byggar-konto?",
+                'links' => [
+                    [
+                        'href' => $this->url->create('users/add'),
+                        'text' => "Skapa ett",
+                    ],
+                ],
+            ]);
+        }
     }
+
     private function createLoginForm()
     {
         return $this->di->form->create([], [
